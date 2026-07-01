@@ -7,442 +7,16 @@
   <meta name="description" content="SmartHome adalah sistem rumah pintar yang memantau keamanan, mengontrol lampu, pintu, dan aktivitas rumah secara otomatis." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="style-sh.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    html { scroll-behavior: smooth; }
-    .rv {
-      opacity: 0;
-      transform: translateY(24px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-    .rv.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .rv-d1 { transition-delay: 0.08s; }
-    .rv-d2 { transition-delay: 0.16s; }
-    .rv-d3 { transition-delay: 0.24s; }
-
-    :root {
-      --bg: #0d1117;
-      --bg-alt: #111827;
-      --surface: #161b22;
-      --surface-2: #1f2937;
-      --text: #f3f4f6;
-      --muted: #9ca3af;
-      --border: #30363d;
-      --accent: #58a6ff;
-      --green: #3fb950;
-      --red: #f85149;
-      --yellow: #d29922;
-      --shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
-      --radius: 18px;
-    }
-
-    [data-theme="light"] {
-      --bg: #f6f8fa;
-      --bg-alt: #eef2f7;
-      --surface: #ffffff;
-      --surface-2: #f3f5f7;
-      --text: #111827;
-      --muted: #6b7280;
-      --border: #d0d7de;
-      --shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
-    }
-
-    [data-theme="midnight"] {
-      --bg: #020617;
-      --bg-alt: #0f172a;
-      --surface: #0f172a;
-      --surface-2: #111d35;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
-      --border: #1e293b;
-      --shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      transition: background 0.25s, color 0.25s;
-      overflow-x: hidden;
-      position: relative;
-    }
-
-    body::before,
-    body::after {
-      content: '';
-      position: fixed;
-      inset: auto;
-      width: 280px;
-      height: 280px;
-      border-radius: 50%;
-      filter: blur(90px);
-      opacity: 0.24;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    body::before {
-      top: -60px;
-      right: -40px;
-      background: var(--accent);
-    }
-
-    body::after {
-      bottom: -80px;
-      left: -50px;
-      background: var(--green);
-    }
-
-    a { color: inherit; text-decoration: none; }
-    img { max-width: 100%; display: block; }
-
-    .wrap { width: min(1120px, calc(100% - 2rem)); margin: 0 auto; }
-    .section-border { border-top: 1px solid var(--border); }
-
-    .nav {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      backdrop-filter: blur(10px);
-      background: rgba(13, 17, 23, 0.75);
-      border-bottom: 1px solid var(--border);
-    }
-
-    [data-theme="light"] .nav { background: rgba(246, 248, 250, 0.82); }
-    [data-theme="midnight"] .nav { background: rgba(2, 6, 23, 0.82); }
-
-    .nav-inner {
-      width: min(1120px, calc(100% - 2rem));
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 0;
-      gap: 1rem;
-    }
-
-    .nav-logo {
-      font-weight: 800;
-      font-size: 1.05rem;
-      letter-spacing: 0.02em;
-      color: var(--accent);
-    }
-
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-    }
-
-    .nav-links { display: flex; gap: 1rem; color: var(--muted); font-size: 0.95rem; }
-    .nav-links a:hover { color: var(--text); }
-
-    .theme-btn, .menu-btn {
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text);
-      border-radius: 999px;
-      width: 42px;
-      height: 42px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: var(--shadow);
-    }
-
-    .theme-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; }
-    .theme-btn .moon { display: none; }
-    [data-theme="light"] .theme-btn .sun { display: none; }
-    [data-theme="light"] .theme-btn .moon { display: block; }
-
-    .menu-btn { display: none; flex-direction: column; gap: 4px; }
-    .menu-btn span { width: 18px; height: 2px; background: currentColor; border-radius: 999px; }
-
-    .hero {
-      padding: 5rem 0 3.2rem;
-      background: linear-gradient(135deg, rgba(88, 166, 255, 0.16), rgba(63, 185, 80, 0.12));
-      position: relative;
-    }
-
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 1.4rem;
-      align-items: center;
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero-inner {
-      display: grid;
-      gap: 1.3rem;
-      max-width: 700px;
-      padding: 1.5rem 0;
-    }
-
-    .hero-tag {
-      display: inline-flex;
-      width: fit-content;
-      padding: 0.45rem 0.8rem;
-      border: 1px solid rgba(88, 166, 255, 0.28);
-      border-radius: 999px;
-      background: rgba(88, 166, 255, 0.1);
-      color: var(--accent);
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .hero-preview {
-      background: linear-gradient(145deg, rgba(22, 27, 34, 0.95), rgba(31, 41, 55, 0.92));
-      border: 1px solid var(--border);
-      border-radius: calc(var(--radius) + 6px);
-      padding: 1.15rem;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(8px);
-    }
-
-    [data-theme="light"] .hero-preview {
-      background: linear-gradient(145deg, rgba(255,255,255,0.96), rgba(243,245,247,0.96));
-    }
-
-    .preview-top {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--muted);
-      font-size: 0.85rem;
-      margin-bottom: 0.9rem;
-    }
-
-    .live-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 0 0 rgba(63, 185, 80, 0.6);
-      animation: pulse 1.5s infinite;
-    }
-
-    .preview-card {
-      display: grid;
-      gap: 0.7rem;
-      padding: 0.95rem;
-      border-radius: 14px;
-      background: rgba(88, 166, 255, 0.08);
-      border: 1px solid rgba(88, 166, 255, 0.2);
-    }
-
-    .preview-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 0.6rem;
-      font-size: 0.92rem;
-    }
-
-    .preview-row span:last-child {
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    .preview-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.55rem;
-      margin-top: 0.8rem;
-    }
-
-    .preview-badge {
-      padding: 0.45rem 0.7rem;
-      border-radius: 999px;
-      background: var(--surface-2);
-      color: var(--muted);
-      font-size: 0.8rem;
-      border: 1px solid var(--border);
-    }
-
-    h1, h2, h3 { line-height: 1.2; }
-    h1 { font-size: clamp(2rem, 4vw, 3.1rem); font-weight: 800; }
-    .hero p { font-size: 1.04rem; color: var(--muted); max-width: 650px; }
-
-    .hero-btns {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.8rem;
-      margin-top: 0.5rem;
-    }
-
-    .btn-dark, .btn-outline {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.85rem 1.15rem;
-      border-radius: 999px;
-      font-weight: 700;
-      transition: transform 0.2s ease, background 0.2s ease;
-    }
-
-    .btn-dark {
-      background: linear-gradient(135deg, var(--accent), #3fb950);
-      color: white;
-    }
-
-    .btn-outline {
-      border: 1px solid var(--border);
-      color: var(--text);
-      background: var(--surface);
-    }
-
-    .btn-dark:hover, .btn-outline:hover { transform: translateY(-1px); }
-
-    .stats section { padding: 1.2rem 0 2rem; }
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-      margin-top: -1rem;
-    }
-
-    .stat {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      border-radius: var(--radius);
-      padding: 1.2rem;
-      text-align: center;
-      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-    }
-
-    .stat:hover,
-    .f-card:hover,
-    .class-card:hover,
-    .ben-card:hover,
-    .step:hover,
-    .specs-wrap:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.22);
-      border-color: rgba(88, 166, 255, 0.35);
-    }
-
-    .stat-num { font-size: 1.35rem; font-weight: 800; color: var(--accent); }
-    .stat-label { font-size: 0.9rem; color: var(--muted); margin-top: 0.25rem; }
-
-    section { padding: 4.2rem 0; }
-    .sh { margin-bottom: 1.6rem; }
-    .sh-label {
-      display: inline-block;
-      margin-bottom: 0.55rem;
-      color: var(--accent);
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .sh h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); margin-bottom: 0.45rem; }
-    .sh p { color: var(--muted); max-width: 720px; }
-
-    .features-grid, .class-grid, .ben-grid {
-      display: grid;
-      gap: 1rem;
-    }
-
-    .features-grid { grid-template-columns: repeat(3, 1fr); }
-    .class-grid { grid-template-columns: repeat(2, 1fr); }
-    .ben-grid { grid-template-columns: repeat(2, 1fr); }
-
-    .f-card, .class-card, .ben-card, .step, .specs-wrap {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-    }
-
-    .f-card, .class-card, .ben-card, .step { padding: 1.2rem; }
-    .f-card-num, .step-num {
-      width: 42px;
-      height: 42px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      background: rgba(88, 166, 255, 0.12);
-      color: var(--accent);
-      font-weight: 800;
-      margin-bottom: 0.8rem;
-    }
-
-    .f-card h3, .ben-card h3, .step h3 { margin-bottom: 0.45rem; font-size: 1.05rem; }
-    .f-card p, .ben-card p, .step p { color: var(--muted); font-size: 0.94rem; }
-
-    .class-card.organic { background: linear-gradient(135deg, rgba(63, 185, 80, 0.12), var(--surface)); }
-    .class-card.inorganic { background: linear-gradient(135deg, rgba(88, 166, 255, 0.12), var(--surface)); }
-    .class-card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.2rem; }
-    .class-card-sub { color: var(--muted); margin-bottom: 0.8rem; font-size: 0.92rem; }
-    .class-list { list-style: none; display: grid; gap: 0.4rem; color: var(--text); font-size: 0.94rem; }
-    .class-list li { display: flex; align-items: center; gap: 0.4rem; }
-    .class-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: inline-block; flex-shrink: 0; }
-
-    .steps { display: grid; gap: 1rem; }
-    .step { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: start; }
-
-    .specs-wrap { padding: 1.1rem; overflow: hidden; }
-    .specs-table { width: 100%; border-collapse: collapse; }
-    .specs-table th, .specs-table td { text-align: left; padding: 0.85rem 0.8rem; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
-    .specs-table th { color: var(--accent); font-weight: 700; }
-    .specs-table tr:last-child td { border-bottom: none; }
-
-    .footer {
-      padding: 1.3rem 0 2rem;
-      color: var(--muted);
-      border-top: 1px solid var(--border);
-      margin-top: 1rem;
-    }
-
-    .footer-inner {
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-      font-size: 0.92rem;
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(63, 185, 80, 0.45); }
-      70% { box-shadow: 0 0 0 10px rgba(63, 185, 80, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(63, 185, 80, 0); }
-    }
-
-    @media (max-width: 860px) {
-      .features-grid { grid-template-columns: 1fr 1fr; }
-      .class-grid, .ben-grid, .stats-row { grid-template-columns: 1fr 1fr; }
-      .hero-grid { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 640px) {
-      .nav-links { display: none; }
-      .menu-btn { display: inline-flex; }
-      .features-grid, .class-grid, .ben-grid, .stats-row, .step { grid-template-columns: 1fr; }
-      .step { display: flex; flex-direction: column; }
-      .footer-inner { flex-direction: column; }
-      .hero { padding-top: 3.2rem; }
-      .hero-preview { margin-top: 0.3rem; }
-    }
-  </style>
 </head>
 <body>
   <nav class="nav">
     <div class="nav-inner">
-      <a href="#" class="nav-logo">SmartHome</a>
+      <a href="#" class="nav-logo">
+        <img src="https://smpn1godean.sch.id/wp-content/uploads/2022/09/LOGO-NEGSAGO.png" alt="Logo sekolah" style="width: 40px; height: 40px;" />
+        <img class="brand-logo" src="smarthome-them-hitam.png" alt="SmartHome" style="width: 140px; height: auto; max-height: 44px; object-fit: contain;" />
+      </a>
       <div class="nav-right">
         <div class="nav-links">
           <a href="#fitur">Fitur</a>
@@ -451,11 +25,12 @@
           <a href="#manfaat">Manfaat</a>
           <a href="#spesifikasi">Spesifikasi</a>
         </div>
+        <div class="theme-picker" title="Ganti tema">
+            <div class="theme-btn t-dark active" onclick="setTheme('dark')" title="Dark"></div>
+            <div class="theme-btn t-light" onclick="setTheme('light')" title="Light"></div>
+            <div class="theme-btn t-mid" onclick="setTheme('midnight')" title="Midnight"></div>
+        </div>
         <a href="index.html" style="display:inline-flex;align-items:center;justify-content:center;padding:0.6rem 0.95rem;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-weight:700;font-size:0.9rem;box-shadow:var(--shadow);text-decoration:none;">↔ EcoSort</a>
-        <button class="theme-btn" id="themeBtn" aria-label="Ganti tema">
-          <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-          <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
         <button class="menu-btn" aria-label="Menu">
           <span></span><span></span><span></span>
         </button>
@@ -481,7 +56,7 @@
             <span>Live monitoring aktif</span>
           </div>
           <div class="preview-card">
-            <div class="preview-row"><strong>Jumlah penghuni</strong><span>2 orang</span></div>
+            <div class="preview-row"><strong>Jumlah penghuni</strong><span>kosong</span></div>
             <div class="preview-row"><strong>Pintu</strong><span>Terkunci</span></div>
             <div class="preview-row"><strong>Lampu</strong><span>3/3 aktif</span></div>
             <div class="preview-row"><strong>Status</strong><span>Aman</span></div>
@@ -524,7 +99,7 @@
     <div class="wrap">
       <div class="sh">
         <div class="sh-label">Fitur</div>
-        <h2>Kenapa SmartHome cocok untuk pameran dan demo rumah pintar?</h2>
+        <h2>Fitur Utama SmartHome</h2>
         <p>Dirancang supaya pengguna bisa melihat fungsi sistem secara langsung, dari monitoring sampai kontrol manual.</p>
       </div>
       <div class="features-grid">
@@ -541,7 +116,7 @@
         <div class="f-card rv rv-d2">
           <div class="f-card-num">03</div>
           <h3>Keamanan Lebih Baik</h3>
-          <p>Alarm dan status pintu membantu menjaga keamanan rumah saat ada aktivitas mencurigakan.</p>
+          <p>Alarm, sensor dan status pintu membantu menjaga keamanan rumah saat ada aktivitas mencurigakan.</p>
         </div>
       </div>
     </div>
@@ -656,7 +231,7 @@
           <tbody>
             <tr><td>Microcontroller</td><td>ESP32</td></tr>
             <tr><td>Sensor</td><td>Ultrasonik, RFID, dan indikator status</td></tr>
-            <tr><td>Kontrol</td><td>Lampu GPIO 2, 12, dan 25</td></tr>
+            <tr><td>Kontrol</td><td>Lampu</td></tr>
             <tr><td>Akses</td><td>Servo motor untuk buka/tutup pintu</td></tr>
             <tr><td>Alarm</td><td>Buzzer aktif saat kondisi bahaya</td></tr>
             <tr><td>Antarmuka</td><td>Dashboard web real-time</td></tr>
@@ -669,29 +244,33 @@
   <footer class="footer">
     <div class="wrap">
       <div class="footer-inner">
-        <p>2026 SmartHome</p>
-        <p>Proyek rumah pintar untuk pameran dan edukasi teknologi</p>
+        <div style="display:flex;align-items:center;gap:0.7rem;">
+          <img src="https://smpn1godean.sch.id/wp-content/uploads/2022/09/LOGO-NEGSAGO.png" alt="Logo sekolah" style="width:34px;height:34px;object-fit:contain;border-radius:8px;background:rgba(255,255,255,0.08);padding:3px;" />
+          <img class="brand-logo" src="smarthome-them-hitam.png" alt="SmartHome" style="width: 120px; height: auto; max-height: 36px; object-fit: contain;" />
+        </div>
+        <p>NexPloIT - SMP Negeri 1 Godean</p>
       </div>
     </div>
   </footer>
 
   <script>
-    const themeBtn = document.getElementById('themeBtn');
     const root = document.documentElement;
 
-    function setTheme(theme) {
-      root.setAttribute('data-theme', theme);
-      localStorage.setItem('smarthome_theme', theme);
+    var THEMES = ['dark','light','midnight'];
+    function setTheme(t) {
+      document.documentElement.setAttribute('data-theme', t);
+      localStorage.setItem('smh_theme', t);
+      document.querySelectorAll('.theme-btn').forEach(function(b,i) {
+        b.classList.toggle('active', THEMES[i] === t);
+      });
+      document.querySelectorAll('.brand-logo').forEach(function(img) {
+        img.src = (t === 'light') ? 'smarthome-them-putih.png' : 'smarthome-them-hitam.png';
+      });
     }
-
-    const savedTheme = localStorage.getItem('smarthome_theme') || 'dark';
-    setTheme(savedTheme);
-
-    themeBtn?.addEventListener('click', () => {
-      const current = root.getAttribute('data-theme') || 'dark';
-      const next = current === 'dark' ? 'light' : current === 'light' ? 'midnight' : 'dark';
-      setTheme(next);
-    });
+    (function(){
+      var saved = localStorage.getItem('smh_theme') || 'dark';
+      setTheme(saved);
+    })();
 
     const revealItems = document.querySelectorAll('.rv');
     const observer = new IntersectionObserver((entries) => {
