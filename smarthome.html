@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartHome - Rumah Pintar</title>
+  <meta name="description" content="SmartHome adalah sistem rumah pintar yang memantau keamanan, mengontrol lampu, pintu, dan aktivitas rumah secara otomatis." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg-alt: #111827;
+      --surface: #161b22;
+      --surface-2: #1f2937;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --border: #30363d;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --red: #f85149;
+      --yellow: #d29922;
+      --shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
+      --radius: 18px;
+    }
+
+    [data-theme="light"] {
+      --bg: #f6f8fa;
+      --bg-alt: #eef2f7;
+      --surface: #ffffff;
+      --surface-2: #f3f5f7;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #d0d7de;
+      --shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+    }
+
+    [data-theme="midnight"] {
+      --bg: #020617;
+      --bg-alt: #0f172a;
+      --surface: #0f172a;
+      --surface-2: #111d35;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #1e293b;
+      --shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background 0.25s, color 0.25s;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    .wrap { width: min(1120px, calc(100% - 2rem)); margin: 0 auto; }
+    .section-border { border-top: 1px solid var(--border); }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+      background: rgba(13, 17, 23, 0.75);
+      border-bottom: 1px solid var(--border);
+    }
+
+    [data-theme="light"] .nav { background: rgba(246, 248, 250, 0.82); }
+    [data-theme="midnight"] .nav { background: rgba(2, 6, 23, 0.82); }
+
+    .nav-inner {
+      width: min(1120px, calc(100% - 2rem));
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0;
+      gap: 1rem;
+    }
+
+    .nav-logo {
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: 0.02em;
+      color: var(--accent);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .nav-links { display: flex; gap: 1rem; color: var(--muted); font-size: 0.95rem; }
+    .nav-links a:hover { color: var(--text); }
+
+    .theme-btn, .menu-btn {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 999px;
+      width: 42px;
+      height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+
+    .theme-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+    .theme-btn .moon { display: none; }
+    [data-theme="light"] .theme-btn .sun { display: none; }
+    [data-theme="light"] .theme-btn .moon { display: block; }
+
+    .menu-btn { display: none; flex-direction: column; gap: 4px; }
+    .menu-btn span { width: 18px; height: 2px; background: currentColor; border-radius: 999px; }
+
+    .hero {
+      padding: 5rem 0 3.2rem;
+      background: linear-gradient(135deg, rgba(88, 166, 255, 0.12), rgba(63, 185, 80, 0.12));
+    }
+
+    .hero-inner {
+      display: grid;
+      gap: 1.3rem;
+      max-width: 700px;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      width: fit-content;
+      padding: 0.45rem 0.8rem;
+      border: 1px solid rgba(88, 166, 255, 0.28);
+      border-radius: 999px;
+      background: rgba(88, 166, 255, 0.1);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 { line-height: 1.2; }
+    h1 { font-size: clamp(2rem, 4vw, 3.1rem); font-weight: 800; }
+    .hero p { font-size: 1.04rem; color: var(--muted); max-width: 650px; }
+
+    .hero-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-top: 0.5rem;
+    }
+
+    .btn-dark, .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.85rem 1.15rem;
+      border-radius: 999px;
+      font-weight: 700;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .btn-dark {
+      background: linear-gradient(135deg, var(--accent), #3fb950);
+      color: white;
+    }
+
+    .btn-outline {
+      border: 1px solid var(--border);
+      color: var(--text);
+      background: var(--surface);
+    }
+
+    .btn-dark:hover, .btn-outline:hover { transform: translateY(-1px); }
+
+    .stats section { padding: 1.2rem 0 2rem; }
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-top: -1rem;
+    }
+
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      text-align: center;
+    }
+
+    .stat-num { font-size: 1.35rem; font-weight: 800; color: var(--accent); }
+    .stat-label { font-size: 0.9rem; color: var(--muted); margin-top: 0.25rem; }
+
+    section { padding: 4.2rem 0; }
+    .sh { margin-bottom: 1.6rem; }
+    .sh-label {
+      display: inline-block;
+      margin-bottom: 0.55rem;
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .sh h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); margin-bottom: 0.45rem; }
+    .sh p { color: var(--muted); max-width: 720px; }
+
+    .features-grid, .class-grid, .ben-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .features-grid { grid-template-columns: repeat(3, 1fr); }
+    .class-grid { grid-template-columns: repeat(2, 1fr); }
+    .ben-grid { grid-template-columns: repeat(2, 1fr); }
+
+    .f-card, .class-card, .ben-card, .step, .specs-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .f-card, .class-card, .ben-card, .step { padding: 1.2rem; }
+    .f-card-num, .step-num {
+      width: 42px;
+      height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(88, 166, 255, 0.12);
+      color: var(--accent);
+      font-weight: 800;
+      margin-bottom: 0.8rem;
+    }
+
+    .f-card h3, .ben-card h3, .step h3 { margin-bottom: 0.45rem; font-size: 1.05rem; }
+    .f-card p, .ben-card p, .step p { color: var(--muted); font-size: 0.94rem; }
+
+    .class-card.organic { background: linear-gradient(135deg, rgba(63, 185, 80, 0.12), var(--surface)); }
+    .class-card.inorganic { background: linear-gradient(135deg, rgba(88, 166, 255, 0.12), var(--surface)); }
+    .class-card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.2rem; }
+    .class-card-sub { color: var(--muted); margin-bottom: 0.8rem; font-size: 0.92rem; }
+    .class-list { list-style: none; display: grid; gap: 0.4rem; color: var(--text); font-size: 0.94rem; }
+    .class-list li { display: flex; align-items: center; gap: 0.4rem; }
+    .class-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: inline-block; flex-shrink: 0; }
+
+    .steps { display: grid; gap: 1rem; }
+    .step { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: start; }
+
+    .specs-wrap { padding: 1.1rem; overflow: hidden; }
+    .specs-table { width: 100%; border-collapse: collapse; }
+    .specs-table th, .specs-table td { text-align: left; padding: 0.85rem 0.8rem; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+    .specs-table th { color: var(--accent); font-weight: 700; }
+    .specs-table tr:last-child td { border-bottom: none; }
+
+    .footer {
+      padding: 1.3rem 0 2rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      margin-top: 1rem;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 860px) {
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .class-grid, .ben-grid, .stats-row { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .menu-btn { display: inline-flex; }
+      .features-grid, .class-grid, .ben-grid, .stats-row, .step { grid-template-columns: 1fr; }
+      .step { display: flex; flex-direction: column; }
+      .footer-inner { flex-direction: column; }
+      .hero { padding-top: 3.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">SmartHome</a>
+      <div class="nav-right">
+        <div class="nav-links">
+          <a href="#fitur">Fitur</a>
+          <a href="#cara-kerja">Cara Kerja</a>
+          <a href="#komponen">Komponen</a>
+          <a href="#manfaat">Manfaat</a>
+          <a href="#spesifikasi">Spesifikasi</a>
+        </div>
+        <a href="index.html" style="display:inline-flex;align-items:center;justify-content:center;padding:0.6rem 0.95rem;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-weight:700;font-size:0.9rem;box-shadow:var(--shadow);text-decoration:none;">↔ EcoSort</a>
+        <button class="theme-btn" id="themeBtn" aria-label="Ganti tema">
+          <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="menu-btn" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-inner">
+        <div class="hero-tag">Smart Home Monitoring</div>
+        <h1>Rumah pintar yang lebih aman, lebih nyaman, dan lebih mudah diawasi.</h1>
+        <p>SmartHome memantau kondisi rumah secara real-time, mulai dari jumlah penghuni, status pintu, lampu, hingga aktivitas sistem. Semua informasi dapat dipantau lewat antarmuka yang sederhana dan modern.</p>
+        <div class="hero-btns">
+          <a href="#fitur" class="btn-dark">Pelajari Fitur</a>
+          <a href="#spesifikasi" class="btn-outline">Lihat Spesifikasi</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="wrap">
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-num">24/7</div>
+          <div class="stat-label">Pemantauan nonstop</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">3 lampu</div>
+          <div class="stat-label">Dapat dikontrol otomatis</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">1 pintu</div>
+          <div class="stat-label">Status buka dan kunci</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">RFID</div>
+          <div class="stat-label">Akses kartu terdaftar</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="fitur">
+    <div class="wrap">
+      <div class="sh">
+        <div class="sh-label">Fitur</div>
+        <h2>Kenapa SmartHome cocok untuk pameran dan demo rumah pintar?</h2>
+        <p>Dirancang supaya pengguna bisa melihat fungsi sistem secara langsung, dari monitoring sampai kontrol manual.</p>
+      </div>
+      <div class="features-grid">
+        <div class="f-card">
+          <div class="f-card-num">01</div>
+          <h3>Monitoring Real-Time</h3>
+          <p>Dashboard menampilkan status pintu, lampu, dan jumlah penghuni secara langsung tanpa perlu proses yang rumit.</p>
+        </div>
+        <div class="f-card">
+          <div class="f-card-num">02</div>
+          <h3>Kontrol Otomatis</h3>
+          <p>Sistem dapat menghidupkan lampu atau mengaktifkan alarm ketika ada kondisi tertentu terdeteksi.</p>
+        </div>
+        <div class="f-card">
+          <div class="f-card-num">03</div>
+          <h3>Keamanan Lebih Baik</h3>
+          <p>Alarm dan status pintu membantu menjaga keamanan rumah saat ada aktivitas mencurigakan.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cara-kerja" class="section-border" style="background: var(--bg-alt);">
+    <div class="wrap">
+      <div class="sh">
+        <div class="sh-label">Cara Kerja</div>
+        <h2>Alur sederhana dari sensor sampai dashboard.</h2>
+        <p>SmartHome bekerja dalam tiga tahapan utama yang mudah dipahami dan dipresentasikan.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div>
+            <h3>Sensor membaca kondisi sekitar</h3>
+            <p>Sensor ultrasonik dan RFID mendeteksi keberadaan orang, kartu akses, serta kondisi di sekitar pintu dan ruangan.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div>
+            <h3>ESP32 memproses data</h3>
+            <p>Microcontroller ESP32 mengolah data sensor lalu menentukan aksi yang sesuai, seperti membuka pintu atau menyalakan lampu.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div>
+            <h3>Dashboard menampilkan hasil</h3>
+            <p>Status rumah, log aktivitas, dan keadaan alarm tampil secara otomatis di halaman monitoring.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="komponen">
+    <div class="wrap">
+      <div class="sh">
+        <div class="sh-label">Komponen</div>
+        <h2>Bagian utama yang membentuk sistem ini.</h2>
+        <p>Setiap komponen memiliki peran penting agar rumah pintar bisa berjalan dengan baik.</p>
+      </div>
+      <div class="class-grid">
+        <div class="class-card organic">
+          <div class="class-card-title">Kontrol Rumah</div>
+          <div class="class-card-sub">Pusat interaksi dan monitoring</div>
+          <ul class="class-list">
+            <li><span class="class-dot"></span>Pintu utama dengan status buka/kunci</li>
+            <li><span class="class-dot"></span>Lampu ruang tamu, kamar, dan lantai 2</li>
+            <li><span class="class-dot"></span>Alarm dan notifikasi status</li>
+          </ul>
+        </div>
+        <div class="class-card inorganic">
+          <div class="class-card-title">Sensor & Akses</div>
+          <div class="class-card-sub">Mendeteksi aktivitas dan pengguna</div>
+          <ul class="class-list">
+            <li><span class="class-dot"></span>Sensor ultrasonik untuk deteksi orang</li>
+            <li><span class="class-dot"></span>RFID untuk akses kartu terdaftar</li>
+            <li><span class="class-dot"></span>LCD dan buzzer sebagai indikator</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="manfaat" class="section-border" style="background: var(--bg-alt);">
+    <div class="wrap">
+      <div class="sh">
+        <div class="sh-label">Manfaat</div>
+        <h2>Yang didapatkan pengguna saat memakai SmartHome.</h2>
+        <p>Lebih dari sekadar demo teknologi, sistem ini membawa manfaat nyata dalam kehidupan sehari-hari.</p>
+      </div>
+      <div class="ben-grid">
+        <div class="ben-card">
+          <h3>Praktis</h3>
+          <p>Pengguna tidak perlu repot mengontrol tiap perangkat secara manual karena semuanya terintegrasi.</p>
+        </div>
+        <div class="ben-card">
+          <h3>Aman</h3>
+          <p>Status pintu dan alarm membantu meningkatkan rasa aman saat rumah sedang kosong.</p>
+        </div>
+        <div class="ben-card">
+          <h3>Modern</h3>
+          <p>Antarmuka visual memudahkan presentasi dan edukasi tentang teknologi rumah pintar.</p>
+        </div>
+        <div class="ben-card">
+          <h3>Fleksibel</h3>
+          <p>Sistem dapat dikembangkan lagi dengan fitur tambahan sesuai kebutuhan proyek.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="spesifikasi">
+    <div class="wrap">
+      <div class="sh">
+        <div class="sh-label">Spesifikasi</div>
+        <h2>Detail teknis sistem SmartHome.</h2>
+        <p>Komponen yang dipakai cukup sederhana namun mampu menjalankan fungsi utama dengan baik.</p>
+      </div>
+      <div class="specs-wrap">
+        <table class="specs-table">
+          <thead>
+            <tr>
+              <th>Komponen</th>
+              <th>Detail</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Microcontroller</td><td>ESP32</td></tr>
+            <tr><td>Sensor</td><td>Ultrasonik, RFID, dan indikator status</td></tr>
+            <tr><td>Kontrol</td><td>Lampu GPIO 2, 12, dan 25</td></tr>
+            <tr><td>Akses</td><td>Servo motor untuk buka/tutup pintu</td></tr>
+            <tr><td>Alarm</td><td>Buzzer aktif saat kondisi bahaya</td></tr>
+            <tr><td>Antarmuka</td><td>Dashboard web real-time</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer-inner">
+        <p>2026 SmartHome</p>
+        <p>Proyek rumah pintar untuk pameran dan edukasi teknologi</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const themeBtn = document.getElementById('themeBtn');
+    const root = document.documentElement;
+
+    function setTheme(theme) {
+      root.setAttribute('data-theme', theme);
+      localStorage.setItem('smarthome_theme', theme);
+    }
+
+    const savedTheme = localStorage.getItem('smarthome_theme') || 'dark';
+    setTheme(savedTheme);
+
+    themeBtn?.addEventListener('click', () => {
+      const current = root.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : current === 'light' ? 'midnight' : 'dark';
+      setTheme(next);
+    });
+  </script>
+</body>
+</html>
