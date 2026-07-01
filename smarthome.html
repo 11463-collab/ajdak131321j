@@ -9,6 +9,20 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
+    html { scroll-behavior: smooth; }
+    .rv {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .rv.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .rv-d1 { transition-delay: 0.08s; }
+    .rv-d2 { transition-delay: 0.16s; }
+    .rv-d3 { transition-delay: 0.24s; }
+
     :root {
       --bg: #0d1117;
       --bg-alt: #111827;
@@ -55,6 +69,34 @@
       color: var(--text);
       line-height: 1.6;
       transition: background 0.25s, color 0.25s;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      inset: auto;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.24;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::before {
+      top: -60px;
+      right: -40px;
+      background: var(--accent);
+    }
+
+    body::after {
+      bottom: -80px;
+      left: -50px;
+      background: var(--green);
     }
 
     a { color: inherit; text-decoration: none; }
@@ -125,13 +167,24 @@
 
     .hero {
       padding: 5rem 0 3.2rem;
-      background: linear-gradient(135deg, rgba(88, 166, 255, 0.12), rgba(63, 185, 80, 0.12));
+      background: linear-gradient(135deg, rgba(88, 166, 255, 0.16), rgba(63, 185, 80, 0.12));
+      position: relative;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 1.4rem;
+      align-items: center;
+      position: relative;
+      z-index: 1;
     }
 
     .hero-inner {
       display: grid;
       gap: 1.3rem;
       max-width: 700px;
+      padding: 1.5rem 0;
     }
 
     .hero-tag {
@@ -146,6 +199,75 @@
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
+    }
+
+    .hero-preview {
+      background: linear-gradient(145deg, rgba(22, 27, 34, 0.95), rgba(31, 41, 55, 0.92));
+      border: 1px solid var(--border);
+      border-radius: calc(var(--radius) + 6px);
+      padding: 1.15rem;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    [data-theme="light"] .hero-preview {
+      background: linear-gradient(145deg, rgba(255,255,255,0.96), rgba(243,245,247,0.96));
+    }
+
+    .preview-top {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .live-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 0 rgba(63, 185, 80, 0.6);
+      animation: pulse 1.5s infinite;
+    }
+
+    .preview-card {
+      display: grid;
+      gap: 0.7rem;
+      padding: 0.95rem;
+      border-radius: 14px;
+      background: rgba(88, 166, 255, 0.08);
+      border: 1px solid rgba(88, 166, 255, 0.2);
+    }
+
+    .preview-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.92rem;
+    }
+
+    .preview-row span:last-child {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .preview-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 0.8rem;
+    }
+
+    .preview-badge {
+      padding: 0.45rem 0.7rem;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 0.8rem;
+      border: 1px solid var(--border);
     }
 
     h1, h2, h3 { line-height: 1.2; }
@@ -197,6 +319,18 @@
       border-radius: var(--radius);
       padding: 1.2rem;
       text-align: center;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .stat:hover,
+    .f-card:hover,
+    .class-card:hover,
+    .ben-card:hover,
+    .step:hover,
+    .specs-wrap:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.22);
+      border-color: rgba(88, 166, 255, 0.35);
     }
 
     .stat-num { font-size: 1.35rem; font-weight: 800; color: var(--accent); }
@@ -231,6 +365,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
     }
 
     .f-card, .class-card, .ben-card, .step { padding: 1.2rem; }
@@ -281,9 +416,16 @@
       font-size: 0.92rem;
     }
 
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(63, 185, 80, 0.45); }
+      70% { box-shadow: 0 0 0 10px rgba(63, 185, 80, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(63, 185, 80, 0); }
+    }
+
     @media (max-width: 860px) {
       .features-grid { grid-template-columns: 1fr 1fr; }
       .class-grid, .ben-grid, .stats-row { grid-template-columns: 1fr 1fr; }
+      .hero-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 640px) {
@@ -293,6 +435,7 @@
       .step { display: flex; flex-direction: column; }
       .footer-inner { flex-direction: column; }
       .hero { padding-top: 3.2rem; }
+      .hero-preview { margin-top: 0.3rem; }
     }
   </style>
 </head>
@@ -308,7 +451,7 @@
           <a href="#manfaat">Manfaat</a>
           <a href="#spesifikasi">Spesifikasi</a>
         </div>
-        <a href="/" style="display:inline-flex;align-items:center;justify-content:center;padding:0.6rem 0.95rem;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-weight:700;font-size:0.9rem;box-shadow:var(--shadow);text-decoration:none;">↔ EcoSort</a>
+        <a href="index.html" style="display:inline-flex;align-items:center;justify-content:center;padding:0.6rem 0.95rem;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-weight:700;font-size:0.9rem;box-shadow:var(--shadow);text-decoration:none;">↔ EcoSort</a>
         <button class="theme-btn" id="themeBtn" aria-label="Ganti tema">
           <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
           <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -322,13 +465,33 @@
 
   <section class="hero">
     <div class="wrap">
-      <div class="hero-inner">
-        <div class="hero-tag">Smart Home Monitoring</div>
-        <h1>Rumah pintar yang lebih aman, lebih nyaman, dan lebih mudah diawasi.</h1>
-        <p>SmartHome memantau kondisi rumah secara real-time, mulai dari jumlah penghuni, status pintu, lampu, hingga aktivitas sistem. Semua informasi dapat dipantau lewat antarmuka yang sederhana dan modern.</p>
-        <div class="hero-btns">
-          <a href="#fitur" class="btn-dark">Pelajari Fitur</a>
-          <a href="#spesifikasi" class="btn-outline">Lihat Spesifikasi</a>
+      <div class="hero-grid">
+        <div class="hero-inner">
+          <div class="hero-tag rv">Smart Home Monitoring</div>
+          <h1 class="rv rv-d1">Rumah pintar yang lebih aman, lebih nyaman, dan lebih mudah diawasi.</h1>
+          <p class="rv rv-d2">SmartHome memantau kondisi rumah secara real-time, mulai dari jumlah penghuni, status pintu, lampu, hingga aktivitas sistem. Semua informasi dapat dipantau lewat antarmuka yang sederhana dan modern.</p>
+          <div class="hero-btns rv rv-d3">
+            <a href="#fitur" class="btn-dark">Pelajari Fitur</a>
+            <a href="#spesifikasi" class="btn-outline">Lihat Spesifikasi</a>
+          </div>
+        </div>
+        <div class="hero-preview rv rv-d2">
+          <div class="preview-top">
+            <span class="live-dot"></span>
+            <span>Live monitoring aktif</span>
+          </div>
+          <div class="preview-card">
+            <div class="preview-row"><strong>Jumlah penghuni</strong><span>2 orang</span></div>
+            <div class="preview-row"><strong>Pintu</strong><span>Terkunci</span></div>
+            <div class="preview-row"><strong>Lampu</strong><span>3/3 aktif</span></div>
+            <div class="preview-row"><strong>Status</strong><span>Aman</span></div>
+          </div>
+          <div class="preview-badges">
+            <span class="preview-badge">Realtime</span>
+            <span class="preview-badge">RFID</span>
+            <span class="preview-badge">Alarm</span>
+            <span class="preview-badge">ESP32</span>
+          </div>
         </div>
       </div>
     </div>
@@ -337,19 +500,19 @@
   <section class="stats">
     <div class="wrap">
       <div class="stats-row">
-        <div class="stat">
+        <div class="stat rv">
           <div class="stat-num">24/7</div>
           <div class="stat-label">Pemantauan nonstop</div>
         </div>
-        <div class="stat">
+        <div class="stat rv rv-d1">
           <div class="stat-num">3 lampu</div>
           <div class="stat-label">Dapat dikontrol otomatis</div>
         </div>
-        <div class="stat">
+        <div class="stat rv rv-d2">
           <div class="stat-num">1 pintu</div>
           <div class="stat-label">Status buka dan kunci</div>
         </div>
-        <div class="stat">
+        <div class="stat rv rv-d3">
           <div class="stat-num">RFID</div>
           <div class="stat-label">Akses kartu terdaftar</div>
         </div>
@@ -365,17 +528,17 @@
         <p>Dirancang supaya pengguna bisa melihat fungsi sistem secara langsung, dari monitoring sampai kontrol manual.</p>
       </div>
       <div class="features-grid">
-        <div class="f-card">
+        <div class="f-card rv">
           <div class="f-card-num">01</div>
           <h3>Monitoring Real-Time</h3>
           <p>Dashboard menampilkan status pintu, lampu, dan jumlah penghuni secara langsung tanpa perlu proses yang rumit.</p>
         </div>
-        <div class="f-card">
+        <div class="f-card rv rv-d1">
           <div class="f-card-num">02</div>
           <h3>Kontrol Otomatis</h3>
           <p>Sistem dapat menghidupkan lampu atau mengaktifkan alarm ketika ada kondisi tertentu terdeteksi.</p>
         </div>
-        <div class="f-card">
+        <div class="f-card rv rv-d2">
           <div class="f-card-num">03</div>
           <h3>Keamanan Lebih Baik</h3>
           <p>Alarm dan status pintu membantu menjaga keamanan rumah saat ada aktivitas mencurigakan.</p>
@@ -392,21 +555,21 @@
         <p>SmartHome bekerja dalam tiga tahapan utama yang mudah dipahami dan dipresentasikan.</p>
       </div>
       <div class="steps">
-        <div class="step">
+        <div class="step rv">
           <div class="step-num">01</div>
           <div>
             <h3>Sensor membaca kondisi sekitar</h3>
             <p>Sensor ultrasonik dan RFID mendeteksi keberadaan orang, kartu akses, serta kondisi di sekitar pintu dan ruangan.</p>
           </div>
         </div>
-        <div class="step">
+        <div class="step rv rv-d1">
           <div class="step-num">02</div>
           <div>
             <h3>ESP32 memproses data</h3>
             <p>Microcontroller ESP32 mengolah data sensor lalu menentukan aksi yang sesuai, seperti membuka pintu atau menyalakan lampu.</p>
           </div>
         </div>
-        <div class="step">
+        <div class="step rv rv-d2">
           <div class="step-num">03</div>
           <div>
             <h3>Dashboard menampilkan hasil</h3>
@@ -425,7 +588,7 @@
         <p>Setiap komponen memiliki peran penting agar rumah pintar bisa berjalan dengan baik.</p>
       </div>
       <div class="class-grid">
-        <div class="class-card organic">
+        <div class="class-card organic rv">
           <div class="class-card-title">Kontrol Rumah</div>
           <div class="class-card-sub">Pusat interaksi dan monitoring</div>
           <ul class="class-list">
@@ -434,7 +597,7 @@
             <li><span class="class-dot"></span>Alarm dan notifikasi status</li>
           </ul>
         </div>
-        <div class="class-card inorganic">
+        <div class="class-card inorganic rv rv-d1">
           <div class="class-card-title">Sensor & Akses</div>
           <div class="class-card-sub">Mendeteksi aktivitas dan pengguna</div>
           <ul class="class-list">
@@ -455,19 +618,19 @@
         <p>Lebih dari sekadar demo teknologi, sistem ini membawa manfaat nyata dalam kehidupan sehari-hari.</p>
       </div>
       <div class="ben-grid">
-        <div class="ben-card">
+        <div class="ben-card rv">
           <h3>Praktis</h3>
           <p>Pengguna tidak perlu repot mengontrol tiap perangkat secara manual karena semuanya terintegrasi.</p>
         </div>
-        <div class="ben-card">
+        <div class="ben-card rv rv-d1">
           <h3>Aman</h3>
           <p>Status pintu dan alarm membantu meningkatkan rasa aman saat rumah sedang kosong.</p>
         </div>
-        <div class="ben-card">
+        <div class="ben-card rv rv-d2">
           <h3>Modern</h3>
           <p>Antarmuka visual memudahkan presentasi dan edukasi tentang teknologi rumah pintar.</p>
         </div>
-        <div class="ben-card">
+        <div class="ben-card rv rv-d3">
           <h3>Fleksibel</h3>
           <p>Sistem dapat dikembangkan lagi dengan fitur tambahan sesuai kebutuhan proyek.</p>
         </div>
@@ -529,6 +692,17 @@
       const next = current === 'dark' ? 'light' : current === 'light' ? 'midnight' : 'dark';
       setTheme(next);
     });
+
+    const revealItems = document.querySelectorAll('.rv');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('show');
+        }
+      });
+    }, { threshold: 0.15 });
+
+    revealItems.forEach(item => observer.observe(item));
   </script>
 </body>
 </html>
