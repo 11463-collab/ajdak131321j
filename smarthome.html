@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="style-sh.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
+
 <body>
   <nav class="nav">
     <div class="nav-inner">
@@ -24,13 +25,23 @@
           <a href="#komponen">Komponen</a>
           <a href="#manfaat">Manfaat</a>
           <a href="#spesifikasi">Spesifikasi</a>
+          <div class="theme-switcher-epic" id="epicSwitcher">
+          <div class="epic-pill" id="epicPill"></div>
+          <button class="epic-opt active" data-t="dark" onclick="setTheme('dark')">
+            <span class="epic-dot" style="background:#0d1117;border:1.5px solid #444"></span>
+            Dark
+          </button>
+          <button class="epic-opt" data-t="light" onclick="setTheme('light')">
+            <span class="epic-dot" style="background:#f0f2f5;border:1.5px solid #ccc"></span>
+            Light
+          </button>
+          <button class="epic-opt" data-t="midnight" onclick="setTheme('midnight')">
+            <span class="epic-dot" style="background:#020617;border:1.5px solid #1e3a5f"></span>
+            Night
+          </button>
         </div>
-        <div class="theme-picker" title="Ganti tema">
-            <div class="theme-btn t-dark active" onclick="setTheme('dark')" title="Dark"></div>
-            <div class="theme-btn t-light" onclick="setTheme('light')" title="Light"></div>
-            <div class="theme-btn t-mid" onclick="setTheme('midnight')" title="Midnight"></div>
         </div>
-        <a href="index.html" style="display:inline-flex;align-items:center;justify-content:center;padding:0.6rem 0.95rem;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-weight:700;font-size:0.9rem;box-shadow:var(--shadow);text-decoration:none;">↔ EcoSort</a>
+        <a href="/" style="display:inline-flex;align-items:center;justify-content:center;padding:0.6rem 0.95rem;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-weight:700;font-size:0.9rem;box-shadow:var(--shadow);text-decoration:none;"><> EcoSort</a>
         <button class="menu-btn" aria-label="Menu">
           <span></span><span></span><span></span>
         </button>
@@ -258,19 +269,46 @@
 
     var THEMES = ['dark','light','midnight'];
     function setTheme(t) {
-      document.documentElement.setAttribute('data-theme', t);
-      localStorage.setItem('smh_theme', t);
-      document.querySelectorAll('.theme-btn').forEach(function(b,i) {
-        b.classList.toggle('active', THEMES[i] === t);
-      });
-      document.querySelectorAll('.brand-logo').forEach(function(img) {
-        img.src = (t === 'light') ? 'smarthome-them-putih.png' : 'smarthome-them-hitam.png';
-      });
-    }
-    (function(){
-      var saved = localStorage.getItem('smh_theme') || 'dark';
-      setTheme(saved);
-    })();
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('smh_theme', t);
+
+  // update active class
+  document.querySelectorAll('.epic-opt').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.t === t);
+  });
+
+  // geser pill
+  var active = document.querySelector('.epic-opt[data-t="' + t + '"]');
+  var switcher = document.getElementById('epicSwitcher');
+  var pill = document.getElementById('epicPill');
+  if (active && switcher && pill) {
+    var r = active.getBoundingClientRect();
+    var sr = switcher.getBoundingClientRect();
+    pill.style.left = (r.left - sr.left) + 'px';
+    pill.style.width = r.width + 'px';
+  }
+
+  // ganti logo
+  document.querySelectorAll('.brand-logo').forEach(function(img) {
+    img.src = (t === 'light') ? 'smarthome-them-putih.png' : 'smarthome-them-hitam.png';
+  });
+}
+function updateDrawerTheme(active) {
+  ['dark','light','midnight'].forEach(function(t) {
+    var btn = document.getElementById('dt-' + t);
+    if (!btn) return;
+    btn.style.border = (t === active)
+      ? '2px solid var(--accent)'
+      : '1px solid var(--border)';
+  });
+}
+
+// Panggil saat init supaya state-nya sync
+(function(){
+  var saved = localStorage.getItem('smh_theme') || 'dark';
+  setTheme(saved);
+  updateDrawerTheme(saved);
+})();
 
     const revealItems = document.querySelectorAll('.rv');
     const observer = new IntersectionObserver((entries) => {
@@ -282,6 +320,62 @@
     }, { threshold: 0.15 });
 
     revealItems.forEach(item => observer.observe(item));
+
+    // Hamburger menu drawer
+    function openDrawer() {
+      document.getElementById('navDrawer').classList.add('open');
+      document.getElementById('navOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeDrawer() {
+      document.getElementById('navDrawer').classList.remove('open');
+      document.getElementById('navOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.querySelector('.menu-btn').addEventListener('click', openDrawer);
+
+    // Tutup drawer saat tekan Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeDrawer();
+});
   </script>
+  <!-- Mobile overlay -->
+  <div class="nav-overlay" id="navOverlay" onclick="closeDrawer()"></div>
+
+  <!-- Mobile drawer -->
+  <nav class="nav-drawer" id="navDrawer">
+    <button class="drawer-close" onclick="closeDrawer()" aria-label="Tutup menu">&#x2715;</button>
+    <a href="#fitur" onclick="closeDrawer()">Fitur</a>
+    <a href="#cara-kerja" onclick="closeDrawer()">Cara Kerja</a>
+    <a href="#komponen" onclick="closeDrawer()">Komponen</a>
+    <a href="#manfaat" onclick="closeDrawer()">Manfaat</a>
+    <a href="#spesifikasi" onclick="closeDrawer()">Spesifikasi</a>
+    <a href="/" style="margin-top:1rem;">&lt;&gt; EcoSort</a>
+    <!-- Theme picker di drawer mobile -->
+    <div style="padding-bottom:0.8rem;margin-bottom:0.4rem;border-bottom:1px solid var(--border);">
+      <div style="font-size:0.72rem;font-weight:700;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.6rem;">Tema</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+        
+        <button onclick="setTheme('dark');updateDrawerTheme('dark')" id="dt-dark"
+          style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border-radius:12px;border:2px solid var(--accent);background:var(--surface);cursor:pointer;transition:all 0.2s;">
+          <div style="width:28px;height:28px;border-radius:50%;background:#0d1117;border:2px solid #30363d;"></div>
+          <span style="font-size:0.7rem;font-weight:700;color:var(--text);">Dark</span>
+        </button>
+
+        <button onclick="setTheme('light');updateDrawerTheme('light')" id="dt-light"
+          style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;transition:all 0.2s;">
+          <div style="width:28px;height:28px;border-radius:50%;background:#f0f2f5;border:2px solid #d0d7de;"></div>
+          <span style="font-size:0.7rem;font-weight:700;color:var(--text);">Light</span>
+        </button>
+
+        <button onclick="setTheme('midnight');updateDrawerTheme('midnight')" id="dt-midnight"
+          style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;transition:all 0.2s;">
+          <div style="width:28px;height:28px;border-radius:50%;background:#020617;border:2px solid #1e3a5f;"></div>
+          <span style="font-size:0.7rem;font-weight:700;color:var(--text);">Night</span>
+        </button>
+
+      </div>
+</div>
+  </nav>
 </body>
 </html>
